@@ -21,6 +21,10 @@ int valSensor = 1;
 String tag = "";
 int rfid = 0;
 int nfcTag = 0;
+int speakerPin = 7;
+int numTones = 10;
+int tones[ ] = {261, 277, 294, 311, 330, 349, 370, 392, 415, 440,466, 494};// mid C C# D D# E F F# G G# A
+                       
 SoftwareSerial esp8266(RX,TX); 
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); // crea objeto mfrc522 enviando pines de slave select y reset
