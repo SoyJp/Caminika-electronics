@@ -6,7 +6,8 @@
 #define TX 3
 #define RST_PIN  9      // constante para referenciar pin de reset
 #define SS_PIN  10      // constante para referenciar pin de slave select
-
+#define trigPin 8
+#define echoPin 5
 String AP = "AXTEL XTREMO-88F1";       // AP NAME
 String PASS = "038788F1"; // AP PASSWORD
 String API = "MODKV138K9INLWRW";   // Write API KEY
@@ -32,6 +33,8 @@ void setup() {
   sendCommand("AT",5,"OK");
   sendCommand("AT+CWMODE=1",5,"OK");
   sendCommand("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,"OK");
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 void loop() {
@@ -78,6 +81,35 @@ void loop() {
   tag = "";
   rfid = 0;
   nfcTag = 0;
+  long duracion, distancia ;
+            digitalWrite(trigPin, LOW);        // Nos aseguramos de que el trigger está desactivado
+            delayMicroseconds(2);              // Para asegurarnos de que el trigger esta LOW
+            digitalWrite(trigPin, HIGH);       // Activamos el pulso de salida
+            delayMicroseconds(10);             // Esperamos 10µs. El pulso sigue active este tiempo
+            digitalWrite(trigPin, LOW);        // Cortamos el pulso y a esperar el echo
+            duracion = pulseIn(echoPin, HIGH) ;
+            distancia = duracion / 2 / 29.1  ;
+            Serial.println(String(distancia) + " cm.") ;
+   
+            if ( distancia >30){
+                noTone(speakerPin);
+            }
+            
+    
+        if (distancia < 30 && distancia >10){
+               tone(speakerPin, tones[350 - distancia]);
+               delay(700);
+            } 
+            else {
+              noTone(speakerPin);
+              }  
+            if ( distancia < 10){
+                tone(speakerPin, tones[257]);
+                     delay(500);
+            }
+            else{
+              noTone(speakerPin);
+            }
 }
 
 /* ESP 8266 FUNCTIONS */
