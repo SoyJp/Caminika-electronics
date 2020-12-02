@@ -73,56 +73,27 @@ void loop() {
   
   Serial.println();       // nueva linea
   mfrc522.PICC_HaltA();                   // detiene comunicacion con tarjeta
+  
+  makeRequest();
+}
 
-     // ESP 8266 CONNECTION TO THINGSKEAK API 
+void makeRequest(){
+  // ESP 8266 CONNECTION TO THINGSKEAK API 
 
-      String getData = "GET /update?api_key="+ API +"&"+ field +"="+String(nfcTag);
-      sendCommand("AT+CIPMUX=1",5,"OK");
-      sendCommand("AT+CIPSTART=0,\"TCP\",\""+ HOST +"\","+ PORT,15,"OK");
-      sendCommand("AT+CIPSEND=0," +String(getData.length()+4),4,">");
-      esp8266.println(getData);delay(3000);countTrueCommand++;
-      sendCommand("AT+CIPCLOSE=0",5,"OK");
+  String getData = "GET /update?api_key="+ API +"&"+ field +"="+String(nfcTag);
+  sendCommand("AT+CIPMUX=1",5,"OK");
+  sendCommand("AT+CIPSTART=0,\"TCP\",\""+ HOST +"\","+ PORT,15,"OK");
+  sendCommand("AT+CIPSEND=0," +String(getData.length()+4),4,">");
+  esp8266.println(getData);delay(3000);countTrueCommand++;
+  sendCommand("AT+CIPCLOSE=0",5,"OK");
   tag = "";
   rfid = 0;
   nfcTag = 0;
-  long duracion, distancia ;
-            digitalWrite(trigPin, LOW);        // Nos aseguramos de que el trigger está desactivado
-            delayMicroseconds(2);              // Para asegurarnos de que el trigger esta LOW
-            digitalWrite(trigPin, HIGH);       // Activamos el pulso de salida
-            delayMicroseconds(10);             // Esperamos 10µs. El pulso sigue active este tiempo
-            digitalWrite(trigPin, LOW);        // Cortamos el pulso y a esperar el echo
-            duracion = pulseIn(echoPin, HIGH) ;
-            distancia = duracion / 2 / 29.1  ;
-            Serial.println(String(distancia) + " cm.") ;
-   
-            if ( distancia >30){
-                noTone(speakerPin);
-            }
-            
-    
-        if (distancia < 30 && distancia >10){
-               tone(speakerPin, tones[350 - distancia]);
-               delay(700);
-            } 
-            else {
-              noTone(speakerPin);
-              }  
-            if ( distancia < 10){
-                tone(speakerPin, tones[257]);
-                     delay(500);
-            }
-            else{
-              noTone(speakerPin);
-            }
 }
 
 /* ESP 8266 FUNCTIONS */
 
 void sendCommand(String command, int maxTime, char readReplay[]) {
-  Serial.print(countTrueCommand);
-  Serial.print(". at command => ");
-  Serial.print(command);
-  Serial.print(" ");
   while(countTimeCommand < (maxTime*1))
   {
     esp8266.println(command);//at+cipsend
@@ -147,6 +118,9 @@ void sendCommand(String command, int maxTime, char readReplay[]) {
     Serial.println("   <---------------- FAILURE");
     countTrueCommand = 0;
     countTimeCommand = 0;
+    
+    delay(3000);
+    makeRequest();
   }
   
   found = false;
